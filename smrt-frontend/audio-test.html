@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS Audio Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>iOS Audio Compatibility Test</h1>
+        <p>This page tests the audio functionality for iOS devices. Tap the buttons below to test different audio methods.</p>
+        
+        <div class="status" id="status">
+            <strong>Status:</strong> Ready to test
+        </div>
+        
+        <button class="test-button" onclick="testWebAudioAPI()">Test Web Audio API</button>
+        <button class="test-button" onclick="testAudioElement()">Test Audio Element</button>
+        <button class="test-button" onclick="testGameAudio()">Test Game Audio</button>
+        <button class="test-button" onclick="enableAudio()">Enable Audio</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let audioContext = null;
+        let audioElement = null;
+        let audioEnabled = false;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.innerHTML = `<strong>Status:</strong> ${message}`;
+            status.className = `status ${type}`;
+        }
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        function testWebAudioAPI() {
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window['webkitAudioContext'])();
+                }
+                
+                if (audioContext.state === 'suspended') {
+                    updateStatus('Audio context suspended - needs user interaction', 'error');
+                    return;
+                }
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+                
+                updateStatus('Web Audio API test successful!', 'success');
+                addResult('Web Audio API: Working correctly', 'success');
+                
+            } catch (error) {
+                updateStatus('Web Audio API test failed', 'error');
+                addResult(`Web Audio API Error: ${error.message}`, 'error');
+            }
+        }
+
+        function testAudioElement() {
+            try {
+                if (!audioElement) {
+                    audioElement = new Audio('../assets/images/coin-collected.mp3');
+                    audioElement.volume = 0.3;
+                }
+                
+                audioElement.play().then(() => {
+                    updateStatus('Audio element test successful!', 'success');
+                    addResult('Audio Element: Working correctly', 'success');
+                }).catch(error => {
+                    updateStatus('Audio element test failed', 'error');
+                    addResult(`Audio Element Error: ${error.message}`, 'error');
+                });
+                
+            } catch (error) {
+                updateStatus('Audio element creation failed', 'error');
+                addResult(`Audio Element Creation Error: ${error.message}`, 'error');
+            }
+        }
+
+        function testGameAudio() {
+            if (window.game) {
+                window.game.testAudio();
+                updateStatus('Game audio test executed - check console', 'info');
+                addResult('Game Audio: Test executed (check console for details)', 'info');
+            } else {
+                updateStatus('Game not initialized', 'error');
+                addResult('Game Audio: Game not available', 'error');
+            }
+        }
+
+        function enableAudio() {
+            try {
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume().then(() => {
+                        audioEnabled = true;
+                        updateStatus('Audio context resumed successfully!', 'success');
+                        addResult('Audio Context: Resumed successfully', 'success');
+                    }).catch(error => {
+                        updateStatus('Failed to resume audio context', 'error');
+                        addResult(`Audio Context Resume Error: ${error.message}`, 'error');
+                    });
+                } else {
+                    updateStatus('Audio context already running or not available', 'info');
+                    addResult('Audio Context: Already running or not available', 'info');
+                }
+                
+                if (audioElement) {
+                    audioElement.play().then(() => {
+                        audioElement.pause();
+                        audioElement.currentTime = 0;
+                        audioEnabled = true;
+                        updateStatus('Audio element unlocked successfully!', 'success');
+                        addResult('Audio Element: Unlocked successfully', 'success');
+                    }).catch(error => {
+                        addResult(`Audio Element Unlock Error: ${error.message}`, 'error');
+                    });
+                }
+                
+            } catch (error) {
+                updateStatus('Audio enable failed', 'error');
+                addResult(`Audio Enable Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            updateStatus(`Page loaded. iOS Device: ${isIOS}`, 'info');
+            addResult(`Device Detection: ${isIOS ? 'iOS Device Detected' : 'Non-iOS Device'}`, 'info');
+            
+            // Try to initialize audio context
+            try {
+                audioContext = new (window.AudioContext || window['webkitAudioContext'])();
+                addResult(`Audio Context: Created (State: ${audioContext.state})`, 'info');
+            } catch (error) {
+                addResult(`Audio Context Creation Error: ${error.message}`, 'error');
+            }
+        });
+
+        // Enable audio on any user interaction
+        document.addEventListener('touchstart', enableAudio, { once: true });
+        document.addEventListener('click', enableAudio, { once: true });
+    </script>
+</body>
+</html> 

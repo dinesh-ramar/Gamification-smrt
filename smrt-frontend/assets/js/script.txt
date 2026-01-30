@@ -1,0 +1,75 @@
+//  // Function to detect if the user is on a mobile device
+//  function isMobileDevice() {
+//     return window.innerWidth <= 768; // Mobile screen width threshold
+// }
+
+// // Show/hide content based on device
+// function handleDeviceDisplay() {
+//     const popup = document.getElementById("popup");
+//     if (!isMobileDevice()) {
+//         popup.style.display = "flex";
+//         gameContainer.style.display = "none"; // Hide main content
+//         document.body.style.overflow = "hidden";
+//     } else {
+//         popup.style.display = "none";
+//         gameContainer.style.display = "flex"; // Show main content
+//         document.body.style.overflow = "auto";
+//     }
+// }
+//  // Run the check on page load and window resize
+//  window.onload = handleDeviceDisplay;
+//  window.addEventListener('resize', handleDeviceDisplay);
+
+// Update the sparkle function to work with multiple elements
+function createSparkle() {
+  // Select both images
+  const jetLogo = document.querySelector(".jet");
+  const whiteLogo = document.querySelector(".white-logo");
+
+  // Randomly choose which logo to create sparkles around
+  const selectedLogo = Math.random() < 0.5 ? jetLogo : whiteLogo;
+  const rect = selectedLogo.getBoundingClientRect();
+
+  const sparkle = document.createElement("div");
+  sparkle.className = "sparkle";
+
+  // Adjust radius based on the logo
+  const baseRadius = selectedLogo === jetLogo ? 80 : 60;
+  const radius = baseRadius + Math.random() * 30;
+
+  // Random position around the selected logo
+  const angle = Math.random() * Math.PI * 2;
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  sparkle.style.left = centerX + Math.cos(angle) * radius + "px";
+  sparkle.style.top = centerY + Math.sin(angle) * radius + "px";
+  sparkle.style.animation = `sparkleAnimation ${
+    0.5 + Math.random() * 1
+  }s linear forwards`;
+
+  document.body.appendChild(sparkle);
+
+  // Remove sparkle after animation
+  setTimeout(() => {
+    sparkle.remove();
+  }, 2000);
+}
+
+// Create sparkles less frequently
+setInterval(createSparkle, 400);
+
+// Add event listener for animation end
+document
+  .querySelector(".plane-img")
+  .addEventListener("animationend", function (e) {
+    if (e.animationName === "slideInJet") {
+      // Start other animations
+      const animatedElements = document.querySelectorAll(
+        ".top-left, .bottom-left, .bottom-left1, .top-right, .bottom-right, .bottom-right1"
+      );
+      animatedElements.forEach((element) => {
+        element.classList.add("animation-start");
+      });
+    }
+  });

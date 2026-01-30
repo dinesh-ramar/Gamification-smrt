@@ -1,0 +1,1006 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media screen and (min-width: 768px) {
+  body {
+    display: none;
+  }
+
+  body::before {
+    content: "📱 This game is designed for mobile devices only. Please access on your phone or tablet.";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    text-align: center;
+    color: #333;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+    display: block;
+  }
+}
+
+@media screen and (orientation: landscape) {
+  #main-game-content {
+    display: none !important;
+  }
+
+  #landscape-block {
+    display: flex !important;
+  }
+}
+
+html,
+body {
+  overscroll-behavior-y: contain;
+  touch-action: pan-x pan-y;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: #f5f5f5;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+  margin: 0 auto;
+  text-align: center;
+  width: 100%;
+}
+
+.path {
+  position: absolute;
+  background: #34495e;
+  border-radius: 4px;
+  z-index: 5;
+}
+
+.building {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  border: 1px solid #bdc3c77d;
+  z-index: 1;
+}
+
+.building.blue-border {
+  border: 1px solid #2E9DB8 !important;
+  background: #91DBED !important;
+  /* Faint blue border */
+  box-shadow: none;
+}
+
+.building.green-border {
+  border: 1px solid #D4D4D4 !important;
+  /* Faint green border */
+  background: #E7E8EC !important;
+  /* Almost white with a hint of green */
+  box-shadow: none;
+}
+
+.building.cream-border {
+  border: 1px solid #ECDDBB !important;
+  /* Faint cream border */
+  background: #FCF8EE !important;
+  /* Almost white with a hint of cream */
+  box-shadow: none;
+}
+
+.coin {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  z-index: 10;
+  background: none !important;
+  border: none !important;
+  animation: none !important;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 10;
+}
+
+.bonus-coin {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle, #e74c3c, #c0392b);
+  border-radius: 50%;
+  border: 2px solid #a93226;
+  animation: bonusCoinGlow 1s ease-in-out infinite alternate;
+  z-index: 10;
+}
+
+.bonus-coin::before {
+  content: "★";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 8px;
+  font-weight: bold;
+}
+
+@keyframes coinGlow {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes bonusCoinGlow {
+  from {
+    box-shadow: 0 0 5px #e74c3c;
+    transform: scale(1) rotate(0deg);
+  }
+
+  to {
+    box-shadow: 0 0 15px #e74c3c, 0 0 20px #c0392b;
+    transform: scale(1.2) rotate(180deg);
+  }
+}
+
+.player {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  z-index: 20;
+  transition: none; /* Faster transition for smoother movement */
+  background: url('../../assets/images/Victor-rightleg.png') no-repeat center center;
+  background-size: contain;
+  transform-origin: center center;
+  /* Add Pac-Man style movement properties */
+  will-change: transform, left, top;
+  image-rendering: pixelated; /* For crisp sprite rendering */
+}
+
+/* Add smooth movement animation */
+.player.moving {
+  transition: all 0.05s linear; /* Even faster for continuous movement */
+}
+
+/* Add Pac-Man style sprite animation */
+.player.animated {
+  animation: playerWalk 0.3s steps(2) infinite;
+}
+
+@keyframes playerWalk {
+  0% { transform: scaleX(1); }
+  50% { transform: scaleX(1.05); }
+  100% { transform: scaleX(1); }
+}
+
+/* Direction-specific animations */
+.player.facing-left {
+  transform: scaleX(-1);
+}
+
+.player.facing-right {
+  transform: scaleX(1);
+}
+
+.player.facing-up {
+  transform: rotate(180deg);
+}
+
+.player.facing-down {
+  transform: rotate(0deg);
+}
+
+.stats {
+  position: sticky;
+  top: 56px;
+  /* Adjust if .header-sec height changes */
+  left: 0;
+  width: 100%;
+  z-index: 99;
+  background: #e9e9e9;
+  padding: 10px 20px 15px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-top: 1px solid #ecf0f1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.score {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.points-section {
+  color: #2c3e50;
+  display: flex;
+}
+
+.timer {
+  color: #e74c3c;
+}
+
+.controls {
+  margin: 0;
+  padding-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  background: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #255BE3;
+  text-align: center;
+}
+
+.game-over {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.reward {
+  font-size: 48px;
+  margin: 20px 0;
+}
+
+.gold {
+  color: #ffd700;
+}
+
+.silver {
+  color: #c0c0c0;
+}
+
+.bronze {
+  color: #cd7f32;
+}
+
+.none {
+  color: #666;
+}
+
+.restart-btn {
+  padding: 15px 30px;
+  font-size: 18px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background 0.3s;
+}
+
+.restart-btn:hover {
+  background: #2980b9;
+}
+
+.start-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+/* .start-btn {
+   padding: 20px 40px;
+   font-size: 24px;
+   background: #27ae60;
+   color: white;
+   border: none;
+   border-radius: 30px;
+   cursor: pointer;
+   margin-top: 30px;
+   transition: all 0.3s;
+ }
+
+ .start-btn:hover {
+   background: #2ecc71;
+   transform: scale(1.05);
+ } */
+
+.instructions {
+  font-size: 14px;
+  margin: 20px 0;
+  max-width: 300px;
+}
+
+.bonus-stats {
+  margin: 10px 0;
+  font-size: 16px;
+  color: #e74c3c;
+}
+
+.final-stats {
+  margin: 15px 0;
+  font-size: 14px;
+  color: #bdc3c7;
+}
+
+.refresh-btn {
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  /* iPhone-specific improvements */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Ensure proper touch target size */
+  min-width: 44px;
+  min-height: 44px;
+  /* Prevent text selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.refresh-btn:hover {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* iPhone-specific styles */
+@media screen and (max-width: 414px) and (-webkit-min-device-pixel-ratio: 2) {
+  .refresh-btn {
+    /* Ensure larger touch target on iPhone */
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    /* Adjust position for better accessibility */
+    right: 15px;
+    /* Add subtle shadow for better visibility */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .refresh-btn:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+}
+
+.header-sec {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  background: white;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+#reward-section .header-sec {
+  z-index: 1;
+}
+
+.cit-logo {
+  height: 40px;
+}
+
+.game-board {
+  position: relative;
+  width: 340px;
+  max-width: 340px;
+  aspect-ratio: 320 / 600;
+  margin: 0 auto;
+  background: #ffffff;
+  overflow: visible;
+  box-shadow: none;
+  box-sizing: border-box;
+  height: 516px;
+}
+
+.br-bl-none {
+  border-right: none;
+  border-bottom: none;
+}
+
+.building.bt-none {
+  border-top: none;
+}
+
+.building.bb-none {
+  border-bottom: none;
+}
+
+#metroSVG {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  display: block;
+}
+
+#metroSVG path {
+  transition: stroke-width 0.3s ease;
+}
+
+#metroSVG path:hover {
+  stroke-width: 8px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.metro-line-active {
+  animation: metroPulse 2s infinite;
+}
+
+@keyframes metroPulse {
+  0% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.7;
+  }
+}
+
+.coin,
+.bonus-coin {
+  max-width: 12vw;
+  max-height: 12vw;
+  min-width: 20px;
+  min-height: 20px;
+}
+
+@media (max-width: 400px) {
+  .controls {
+    font-size: 0.95em;
+  }
+
+  .player {
+    max-width: 24vw;
+    max-height: 24vw;
+  }
+
+  .coin,
+  .bonus-coin {
+    max-width: 16vw;
+    max-height: 16vw;
+  }
+}
+
+/* Reward Popup Modal Styles
+ .reward-popup-modal {
+   position: fixed;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   background: rgba(0, 0, 0, 0.85);
+   z-index: 9999;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+ }
+
+ .reward-popup-content {
+   background: #fff;
+   border-radius: 18px;
+   padding: 28px 18px 18px 18px;
+   max-width: 350px;
+   width: 92vw;
+   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+   text-align: center;
+   position: relative;
+   color: #222;
+ }
+
+ .reward-citi-logo {
+   width: 80px;
+   margin-bottom: 10px;
+ }
+
+ .reward-title {
+   font-size: 2rem;
+   font-weight: 700;
+   margin: 0 0 8px 0;
+   color: #222;
+ }
+
+ .reward-score {
+   font-size: 1.1rem;
+   margin-bottom: 18px;
+   color: #222;
+ }
+
+ .reward-coupon-box {
+   background: #f7f7f7;
+   border-radius: 12px;
+   padding: 16px 10px 10px 10px;
+   margin-bottom: 18px;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+ }
+
+ .reward-coupon-off {
+   font-size: 1.2rem;
+   font-weight: 600;
+   margin-bottom: 8px;
+   color: #222;
+ }
+
+ .reward-coupon-row {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 8px;
+   margin-bottom: 6px;
+ }
+
+ .reward-coupon-code {
+   font-size: 1.1rem;
+   font-weight: 600;
+   background: #fff;
+   border-radius: 6px;
+   padding: 6px 14px;
+   border: 1px dashed #bbb;
+   letter-spacing: 1px;
+ }
+
+ .reward-copy-btn {
+   background: none;
+   border: none;
+   cursor: pointer;
+   padding: 0 2px;
+ }
+
+ .reward-coupon-desc {
+   font-size: 0.85rem;
+   color: #888;
+   margin-top: 2px;
+ }
+
+ .reward-claim-btn {
+   width: 100%;
+   background: #2563eb;
+   color: #fff;
+   font-size: 1.1rem;
+   font-weight: 600;
+   border: none;
+   border-radius: 8px;
+   padding: 12px 0;
+   margin: 12px 0 18px 0;
+   cursor: pointer;
+   transition: background 0.2s;
+ }
+
+ .reward-claim-btn:hover {
+   background: #1746a0;
+ }
+
+ .reward-card-ad {
+   background: #f7f7f7;
+   border-radius: 12px;
+   padding: 12px 10px 10px 10px;
+   margin-bottom: 16px;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+ }
+
+ .reward-card-ad-text {
+   font-size: 0.98rem;
+   color: #222;
+   margin-bottom: 8px;
+ }
+
+ .reward-cash {
+   background: #e6f0fa;
+   color: #2563eb;
+   font-weight: 700;
+   border-radius: 6px;
+   padding: 2px 8px;
+   font-size: 1rem;
+ }
+
+ .reward-card-img {
+   width: 90%;
+   max-width: 220px;
+   margin: 8px 0 10px 0;
+   border-radius: 8px;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+ }
+
+ .reward-apply-btn {
+   width: 100%;
+   background: #fff;
+   color: #2563eb;
+   font-size: 1rem;
+   font-weight: 600;
+   border: 2px solid #2563eb;
+   border-radius: 8px;
+   padding: 8px 0;
+   margin-top: 4px;
+   cursor: pointer;
+   transition: background 0.2s, color 0.2s;
+ }
+
+ .reward-apply-btn:hover {
+   background: #2563eb;
+   color: #fff;
+ }
+
+ .reward-popup-icons {
+   display: flex;
+   justify-content: center;
+   gap: 32px;
+   margin-top: 10px;
+ }
+
+ .reward-home-btn,
+ .reward-share-btn {
+   background: #fff;
+   border: 2px solid #e5e7eb;
+   border-radius: 10px;
+   padding: 8px 14px;
+   cursor: pointer;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+   transition: background 0.2s, border 0.2s;
+ }
+
+ .reward-home-btn:hover,
+ .reward-share-btn:hover {
+   background: #f0f4fa;
+   border: 2px solid #2563eb;
+ }
+
+ .reward-home-btn img,
+ .reward-share-btn img {
+   width: 28px;
+   height: 28px;
+ }
+
+ @media (max-width: 400px) {
+   .reward-popup-content {
+     padding: 16px 2vw 10px 2vw;
+     max-width: 98vw;
+   }
+
+   .reward-citi-logo {
+     width: 60px;
+   }
+
+   .reward-card-img {
+     max-width: 150px;
+   }
+ } */
+
+@keyframes arrowPulse {
+  0% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(-8px);
+  }
+
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+#player-arrow.blinking {
+  animation: arrowPulse 1.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.metro-dot-outer {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  position: absolute;
+  z-index: 10;
+  box-shadow: 0 0 2px #0002;
+}
+
+.metro-dot-inner {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  top: 1.5px;
+  left: 1.5px;
+}
+
+/* --- Over-lapping circles beside the points counter --- */
+.points-icon {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  /* room for 3 circles */
+  margin-right: 10px;
+  /* small gap before the number */
+}
+
+.points-icon .circle {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid;
+  line-height: normal;
+  /* colour added per circle */
+}
+
+#pointsDisplay {
+  font-size: 24px;
+  font-weight: 600;
+  color: #000;
+  line-height: normal;
+}
+
+.points-icon .green {
+  left: 0;
+  border-color: #00a651;
+}
+
+/* green */
+.points-icon .orange {
+  left: 8px;
+  border-color: #ff9c00;
+}
+
+/* orange */
+.points-icon .brown {
+  left: 18px;
+  border-color: #8B4513;
+}
+
+/* brown  */
+
+
+.player-sprite {
+  position: relative;
+  width: 40px;
+  /* Adjust to match your sprite size */
+  height: 40px;
+  /* Adjust to match your sprite size */
+  transform-origin: bottom center;
+}
+
+.player-sprite img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.viewport {
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  overflow: scroll;
+  padding: 57px 10px 10px;
+  position: relative;
+  zoom: 1.6;
+}
+
+.shine-icon {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.shine-icon::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(120deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      transparent 100%);
+  transform: skewX(-20deg);
+  animation: shineDiagonal 2s infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes shineDiagonal {
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+.timer {
+  font-size: 20px;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  line-height: normal;
+}
+
+.timer-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.refresh-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.try-again-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.try-again-content {
+  background: rgba(0, 0, 0, 0.52);
+  border-radius: 12px;
+  padding: 1.5rem 1.5rem;
+  width: 96%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: normal;
+}
+
+.try-again-content p {
+  font-size: 18px;
+}
+
+.game-header {
+  display: flex !important;
+  visibility: visible !important;
+}
+
+#timer,
+#pointsDisplay {
+  display: block !important;
+  visibility: visible !important;
+}
+
+#gameBoard {
+  display: block !important;
+}
+
+/* Ensure game over screens are properly layered */
+#try-again,
+#gameOver,
+#rewardPopup {
+  z-index: 1000;
+}
+
+/* Game Screen Slide-Up Animation */
+#game-screen {
+  /* Add initial position for slide-up animation */
+  transform: translateY(100vh);
+  -webkit-transform: translateY(100vh);
+  transition: transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  -webkit-transition: -webkit-transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Ensure proper visibility handling */
+  visibility: hidden;
+  opacity: 0;
+  /* Safari-specific fixes */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+}
+
+#game-screen.slide-up {
+  transform: translateY(0);
+  -webkit-transform: translateY(0);
+}
+
+/* Points Animation */
+@keyframes pointsFloat {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -100px) scale(1);
+    }
+}
+
+.points-animation {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1000;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    animation: pointsFloat 1s ease-out forwards;
+}

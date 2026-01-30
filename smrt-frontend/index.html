@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Citi Metro Pac-Man SPA</title>
+    <!-- External CSS for all screens -->
+    <link rel="stylesheet" href="assets/css/start-screen.css" />
+    <link rel="stylesheet" href="assets/css/gaming.css" />
+    <link rel="stylesheet" href="assets/css/game-board.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Internal CSS from first-page.html -->
+    <style>
+        .header-sec {
+            display: flex;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        .border-18 {
+            border-radius: 38px;
+        }
+
+        .tnc a {
+            color: #2E66F3;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .start {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            padding: 12px 30px;
+            cursor: pointer;
+        }
+
+        .bgGrey {
+            background: #e2e2e2;
+        }
+
+        /* New styles moved from inline */
+        .start-screen-container {
+            background-image: url('img/citi-start-new-Wide.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100vw;
+            height: 92vh;
+        }
+
+        .title-section {
+            text-align: center;
+            padding-top: 20px;
+            padding-bottom: 10px;
+        }
+
+        .game-title {
+            font-weight: 700;
+            font-size: 40px;
+            line-height: 100%;
+            letter-spacing: -0.8px;
+            color: #255BE3;
+            margin: 0;
+            padding: 0;
+        }
+
+        .game-subtitle {
+            font-weight: 400;
+            font-size: 20px;
+            line-height: 100%;
+            letter-spacing: -0.4px;
+            color: #121212;
+            margin: 10px 0 0 0;
+            padding: 0;
+        }
+    </style>
+    <!-- Internal CSS from index-metro-door.html -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Citi sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            overflow: auto;
+        }
+
+        .logo {
+            width: 90px;
+            margin-top: 10px;
+            padding: 20px;
+            margin: 0 auto;
+        }
+
+        .header-container {
+            width: 100%;
+            padding: 10px 0;
+            text-align: left;
+            background: #fff;
+            position: relative;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            width: 90px;
+            padding: 20px;
+        }
+
+        /* Restrict fixed positioning to door overlay only */
+        #door-overlay .container {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            top: 0;
+            left: 0;
+        }
+
+        .door {
+            position: absolute;
+            top: 0;
+            width: 50vw;
+            height: 100vh;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 10;
+            transition: transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .left-door {
+            left: -50vw;
+            background-image: url('assets/images/door-left-side.png');
+            background-size: 100% 100%;
+        }
+
+        .right-door {
+            right: -50vw;
+            background-image: url('assets/images/door-right-side.png');
+            background-size: 100% 100%;
+        }
+
+        .left-door.active {
+            transform: translateX(50vw);
+        }
+
+        .right-door.active {
+            transform: translateX(-50vw);
+        }
+
+        .left-door.open {
+            transform: translateX(-100vw);
+        }
+
+        .right-door.open {
+            transform: translateX(100vw);
+        }
+
+        .bottom-slab {
+            position: absolute;
+            bottom: -100px;
+            width: 100vw;
+            height: 100px;
+            background-image: url('images/Rectangle_131.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 9;
+        }
+
+        .bottom-slab.active {
+            transform: translateY(-100px);
+        }
+
+        .bottom-slab.open {
+            transform: translateY(100px);
+        }
+
+        .banner {
+            position: absolute;
+            bottom: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            transition: bottom 1s ease-in-out, opacity 0.5s;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .banner.show {
+            bottom: 150px;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @font-face {
+            font-family: 'citi-sans-text';
+            src: url('assets/fonts/citi-sans-text-regular.woff2') format('woff2'), url('assets/fonts/citi-sans-text-regular.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'citi-sans-text-bold';
+            src: url('assets/fonts/citi-sans-text-bold.woff2') format('woff2'), url('assets/fonts/citi-sans-text-bold.woff') format('woff');
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        *,
+        body {
+            font-family: 'citi-sans-text', 'citi-interstate', sans-serif;
+        }
+
+        /* Dark translucent container */
+        .score-container {
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.75);
+            border-radius: 12px;
+            text-align: center;
+            padding: 1.5rem 2rem 1.5rem 2rem;
+            max-width: 320px;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            margin-bottom: 50px;
+        }
+
+        .heading {
+            font-weight: 700;
+            font-size: 44.76px;
+            line-height: 100%;
+            margin-bottom: 1.6rem;
+            color: #FFFFFF;
+        }
+
+        .subheading {
+            font-weight: 500;
+            font-size: 28px;
+            line-height: 34px;
+            margin-bottom: 0.8rem;
+            color: #FFFFFF;
+        }
+
+        .score-badge {
+            background: #FFFFFF;
+            border: 1px solid #EAEAEA;
+            color: #011D3D;
+            /* Navy blue */
+            font-weight: 700;
+            font-size: 29.39px;
+            line-height: 2.375rem;
+            border-radius: 0.75rem;
+            padding: 0.5rem 1.5rem;
+            display: inline-flex;
+            align-items: baseline;
+            gap: 0.3rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .score-points {
+            font-weight: 700;
+            font-size: 2.25rem;
+            line-height: 2.75rem;
+        }
+
+        .text-info {
+            font-weight: 400;
+            font-size: 19px;
+            line-height: 34px;
+            margin-bottom: 2rem;
+            color: #FFFFFF;
+        }
+
+        .target {
+            font-weight: 500;
+            font-size: 18px;
+            line-height: 28px;
+            margin-top: 0.5rem;
+            color: #FFFFFF;
+        }
+
+        .btn-play-again {
+            background: #1a73e8;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 20px;
+            border: none;
+            padding: 0.85rem 2.5rem;
+            border-radius: 100px;
+            cursor: pointer;
+            margin-top: 1rem;
+            max-width: 180px;
+            width: 100%;
+        }
+
+        #try-again {
+            background: linear-gradient(0deg, rgba(47, 0, 0, 0.56), rgba(47, 0, 0, 0.56)),
+                linear-gradient(0deg, rgba(12, 2, 2, 0.27), rgba(12, 2, 2, 0.27)),
+                rgba(143, 143, 143, 0.11);
+            background-size: cover;
+            background-position: center;
+            color: white;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            flex-direction: column;
+            padding: 24px;
+            backdrop-filter: blur(9.300000190734863px)
+        }
+
+        .try-again-content h2 {
+            font-size: 38px;
+            color: rgba(255, 255, 255, 1);
+            text-shadow: 1.8px 1.8px rgba(255, 255, 255, 0.4);
+            font-weight: 700;
+        }
+
+        #try-again-score {
+            font-size: 40px;
+        }
+
+        .try-again-score {
+            font-size: 26px;
+            font-weight: 700;
+            font-family: 'citi-sans-text';
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        /* Special styling for 0 points */
+        .try-again-score p {
+            background: rgba(255, 255, 255, 1);
+            border: 4px solid rgba(234, 234, 234, 1);
+            display: block;
+            border-radius: 12px;
+            border-width: 4px;
+            padding: 8px 27px 12px 27px;
+            box-sizing: border-box;
+            line-height: 1.2;
+            text-align: center;
+            color: rgba(1, 29, 61, 1);
+            width: fit-content;
+            font-size: 27px;
+            font-weight: 700;
+            margin: 24px auto 0 auto;
+        }
+
+        .try-again-score span {
+            display: inline-block;
+            text-align: center;
+            font-size: 18px;
+            line-height: 1.4;
+        }
+    </style>
+    <!-- Tap-to-Start Overlay Styles -->
+    <style>
+        .tap-to-start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            backdrop-filter: blur(2px);
+        }
+
+        /* Ensure smooth hiding */
+        .tap-to-start-overlay[style*="display: none"] {
+            pointer-events: none;
+        }
+
+        .tap-to-start-content {
+            text-align: center;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            padding: 40px;
+        }
+
+        .tap-to-start-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .tap-indicator {
+            font-size: 3rem;
+            margin: 20px 0;
+            animation: tapPulse 1.5s infinite;
+        }
+
+        @keyframes tapPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        .tap-to-start-content p {
+            font-size: 1.1rem;
+            margin-top: 15px;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 480px) {
+            .tap-to-start-content h2 {
+                font-size: 2rem;
+            }
+
+            .tap-indicator {
+                font-size: 2.5rem;
+            }
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+
+
+        .title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 0;
+            text-align: left;
+            color: #000000;
+        }
+
+        .instruction-card {
+            background-color: #EBEBEB;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .instruction-text {
+            text-align: center;
+            /* margin-bottom: 15px; */
+            font-size: 16px;
+            line-height: 1.4;
+            color: #0D0D0D;
+        }
+
+        .instruction-text b {
+            font-weight: 700;
+        }
+
+        .icons-container {
+            display: flex;
+            justify-content: center;
+            gap: 0px;
+            place-items: center;
+            margin: 15px 0;
+            flex-direction: column;
+        }
+
+        .icon {
+            width: 40px;
+            height: 40px;
+            /* border-radius: 50%; */
+            /* border: 2px solid #4CAF50; */
+            /* padding: 5px; */
+        }
+
+        .points-text {
+            text-align: center;
+            font-size: 14px;
+            color: #0D0D0D;
+        }
+
+        .timer-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+        }
+
+        img.reward-image {
+            width: -webkit-fill-available;
+        }
+
+        .reward-card {
+            background-color: #1a73e8;
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .reward-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .start-button {
+            background-color: #2E66F3;
+            color: #FFFFFF;
+            font-size: 18px !important;
+            font-weight: 600;
+            display: block;
+            margin: 0px auto 0;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 100px;
+            margin-top: 0.8rem;
+            max-width: 46vw;
+            width: 100%;
+        }
+
+        .start-button:hover {
+            background-color: #1557b0;
+        }
+
+        h2.subtitle {
+            font-weight: 600;
+            font-size: 17px;
+            /*16px*/
+            margin: 0 0 4px 0;
+            color: #000000;
+            text-align: center;
+        }
+
+        .game-t {
+            font-size: 20px;
+            text-align: center;
+        }
+
+        #howToPlayHeading {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .border-18 {
+            border-radius: 38px;
+        }
+
+        .start {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            padding: 12px 30px;
+            cursor: pointer;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 100vw;
+            background: linear-gradient(180deg, #060606 0%, #606060 100%);
+            z-index: 0;
+        }
+
+        .background-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px, 15px 15px;
+            background-position: 0 0, 10px 10px;
+            opacity: 0.25;
+            pointer-events: none;
+        }
+
+        .container.winner-card {
+            max-width: 390px;
+            width: 100%;
+            padding: 20px;
+            position: relative;
+            margin: 0 auto 40px;
+        }
+
+        .winner-card .header {
+            text-align: center;
+            margin: 20px 0 10px;
+        }
+
+        .winner-card .card-text p {
+            text-align: center;
+            /* margin-top: 10px; */
+            font-size: 14px;
+            color: #FFFFFF;
+        }
+
+        .winner-card h2 {
+            font-size: 32px;
+            margin-bottom: 4px;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        .winner-card .points {
+            font-size: 22px;
+            color: #FFFFFF;
+        }
+
+        .winner-card .coupon-card {
+            background: #f0f0f0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: #000000;
+            margin: 10px 0 10px;
+        }
+
+        .winner-card .coupon-title {
+            font-size: 18.5px;
+            font-weight: 600;
+            line-height: 22px;
+            margin-bottom: 5px;
+            color: #000000;
+        }
+
+        .winner-card .coupon-subtitle {
+            font-size: 16.74px;
+            color: #101010;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .winner-card .coupon-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fff;
+            padding: 10px 15px;
+            font-weight: 700;
+            font-size: 17px;
+            color: #101010;
+            width: 70vw;
+            border-radius: 8px;
+            position: relative;
+            margin: 10px auto;
+        }
+
+        .winner-card .coupon-box::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            background:
+                linear-gradient(to right, #ccc 40%, transparent 0%) top,
+                linear-gradient(to right, #ccc 40%, transparent 0%) bottom,
+                linear-gradient(to bottom, #ccc 40%, transparent 0%) left,
+                linear-gradient(to bottom, #ccc 40%, transparent 0%) right;
+            background-size: 10px 2px, 10px 2px, 2px 10px, 2px 10px;
+            background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+            background-position: top left, bottom left, top left, top right;
+            pointer-events: none;
+        }
+
+        .winner-card .icon-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .winner-card .coupon-icon {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            object-fit: contain;
+            border: none;
+            background: none;
+        }
+
+        .winner-card .info-text {
+            font-size: 15px;
+            color: #a8a8a8;
+            margin-top: 8px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .winner-card .terms {
+            font-size: 13px;
+            color: #011D3D;
+            /* margin-top: 10px; */
+        }
+
+        .winner-card .terms a {
+            color: #011D3D;
+        }
+
+        .winner-card .claim-button {
+            background: #255BE3;
+            color: #FFFFFF;
+            width: 90%;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 20px auto 0;
+            cursor: pointer;
+            display: block;
+        }
+
+        .winner-card .card-promo {
+            border-radius: 12px;
+            padding: 20px;
+            /* margin: 20px 0; */
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .winner-card .card-text {
+            text-align: center;
+            /* margin-bottom: 15px; */
+            font-size: 14.5px;
+            color: #FFFFFF;
+        }
+
+        .card-text p {
+            margin: 0;
+        }
+
+        .winner-card .card-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            /* padding-bottom: 7px; */
+        }
+
+        .winner-card .apply-button {
+            background: #FFFFFF;
+            color: #011D3D;
+            width: 93%;
+            padding: 15px;
+            border: 1px solid #000000;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 500;
+            /* margin-top: 15px; */
+            cursor: pointer;
+            margin: 0px 10px;
+        }
+
+        .winner-card .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 26px;
+            /* margin-top: 20px; */
+        }
+
+        .winner-card .nav-button {
+            width: 18%;
+            height: 18%;
+            padding: 2px;
+            background: #ffffff;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .apply-btn {
+            background: #255BE3;
+            color: #FFFFFF;
+            width: 48vw;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: 500;
+            margin: auto;
+            cursor: pointer;
+            display: block;
+        }
+    </style>
+    <!-- No unique internal CSS in index-game.html (all styles are in external CSS) -->
+
+    <!-- Downloadable Banner Coupon -->
+    <style>
+        /* --Downloadable Banner Coupon */
+        #canvas {
+            display: none;
+        }
+
+        /* Color Firework */
+        .color-firework {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            z-index: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Start Screen Section -->
+    <div id="start-screen">
+        <!-- Migrated from first-page.html -->
+        <div class="header-sec">
+            <img class="cit-logo" src="assets/images/citi-blue-redarc-rgb.png" alt="Citi Logo" />
+        </div>
+        <div class="container p-0 bgGrey start-screen-container">
+            <div class="title-section">
+                <h1 class="game-title">Rush Hour Run</h1>
+                <p class="game-subtitle">Presented by Citi SMRT Card</p>
+            </div>
+            <div class="div-2">
+                <div class="div2 d-flex justify-content-center">
+                    <button id="to-door-animation" class="start btn btn-primary py-2 border-18 rounded-pill">Start
+                        Game</button>
+                </div>
+                <div class="tnc d-flex justify-content-between px-3 mt-4 mb-3">
+                    <a href="#">Terms & Conditions</a>
+                    <a href="#">How to Play</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Door Animation Overlay (now global, not a section) -->
+    <div id="door-overlay"
+        style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999; pointer-events:none;">
+        <div class="container"
+            style="position:fixed; width:100vw; height:100vh; overflow:hidden; top:0; left:0; background:none;">
+            <div class="door left-door" id="leftDoor"></div>
+            <div class="door right-door" id="rightDoor"></div>
+            <div class="bottom-slab" id="bottomSlab"></div>
+        </div>
+    </div>
+
+    <!-- Game Screen Section -->
+    <div id="game-screen">
+
+        <!-- Tap-to-Start Overlay -->
+        <div id="tapToStart" class="tap-to-start-overlay">
+            <div class="tap-to-start-content">
+                <h2>TAP TO START</h2>
+                <div class="tap-indicator">👆🏻</div>
+            </div>
+        </div>
+        <!-- Migrated from index-game.html -->
+        <div id="landscape-block"
+            style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#fff; color:#222; z-index:99999; align-items:center; justify-content:center; text-align:center; font-size:1.2em;">
+            🔄 Please rotate your device to portrait mode to play the game.
+        </div>
+        <noscript style="color: white; text-align:center">
+            You need to enable JavaScript to run this app.
+        </noscript>
+        <div id="react-root">
+            <div class="page-loading" role="alert" aria-busy="true" aria-live="polite" aria-label="loading">
+                <div class="loading__animation">
+                    <div class="loading__animation__bounce"></div>
+                    <div class="loading__animation__bounce"></div>
+                    <div class="loading__animation__bounce"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Begin full game content from index-game.html -->
+        <div class="header-sec">
+            <img class="cit-logo" src="images/Citi-logo.png" alt="Citi Logo" />
+            <button class="refresh-btn"><img src="images/refresh.png" alt="Refresh" class="refresh-icon" /></button>
+        </div>
+        <div class="stats">
+            <div class="controls">
+                Score 100 points to get your reward
+            </div>
+            <div class="score">
+                <div class="points-section">
+                    <div class="points-icon">
+                        <span class="circle green"></span>
+                        <span class="circle orange"></span>
+                        <span class="circle brown"></span>
+                    </div>
+                    <div class="points-display">
+                        <span id="pointsDisplay">0</span>
+                    </div>
+                </div>
+                <div class="timer">
+                    <img src="assets/images/Time.png" alt="Timer" class="timer-icon" />
+                    <span id="timer">1:00</span>
+                </div>
+            </div>
+        </div>
+        <div class="game-container">
+            <div class="viewport">
+                <div class="game-board metro-map-container" id="gameBoard">
+                    <!-- SVG Container for Metro Lines -->
+                    <svg id="metroSVG" width="100%" height="100%"
+                        style="position:absolute;top:0;left:0;z-index:4;pointer-events:none;">
+                        <!-- Metro lines will be drawn here -->
+                    </svg>
+                    <!-- Update the player HTML structure -->
+                    <div id="player" class="player">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End full game content from index-game.html -->
+    </div>
+    <!-- Reward Section (replaces popup modal, hidden by default) -->
+    <div id="reward-section" style="display:none;">
+        <div class="header-sec">
+            <img class="cit-logo" src="assets/images/citi-blue-redarc-rgb.png" alt="Citi Logo" />
+        </div>
+        <div class="background-overlay"></div>
+        <img src="assets/images/paper-fireworks.gif" class="color-firework">
+        <div class="reward-popup-content container winner-card">
+            <div class="header">
+                <h2 class="reward-title">Congratulations</h2>
+                <div class="reward-score points">You have scored <span id="rewardPointsSection">100</span>
+                    <b>points!</b>
+                </div>
+            </div>
+            <div class="coupon-card">
+                <div class="coupon-title">S$5 off Fresh Groceries Delivery with min. S$60 spend</div>
+                <div class="coupon-box reward-coupon-row">
+                    <span class="reward-coupon-code" id="rewardCouponSection">#2025CITI5OFF60QS</span>
+                    <div class="icon-box">
+                        <button class="reward-copy-btn coupon-icon" onclick="copyRewardCouponSection()"
+                            title="Copy Code">
+                            <img src="images/copy.png" alt="Copy" style="width:18px;vertical-align:middle;" />
+                        </button>
+                        <button class="reward-download-btn coupon-icon" onclick="downloadRewardCouponSection()"
+                            title="Download Code">
+                            <img src="images/download.png" alt="Download" style="width:18px;vertical-align:middle;" />
+                        </button>
+                    </div>
+                </div>
+                <p class="info-text">Copy the code above and paste at checkout</p>
+                <div class="reward-coupon-desc">T&Cs apply. <a href="#">Click here</a> to read T&Cs.</div>
+                <canvas id="canvas"></canvas>
+            </div>
+            <button class="reward-claim-btn claim-button">Claim Now</button>
+            <div class="reward-card-ad card-promo">
+                <div class="reward-card-ad-text card-text">Don't have a Citi <b>SMRT Card</b> yet?<br>Sign up to
+                    enjoy <b>5% savings*</b> and upsized welcome gift of <span class="reward-cash"
+                        style="background-color: #fffffff2; color: #000000; padding: 2px 6px; border-radius: 7px;"><strong>S$400</strong></span>
+                    cash back*.</div>
+                <img src="images/citi-card-2.png" alt="Citi SMRT Card" class="reward-card-img card-image"
+                    style="margin-top: 10px;" />
+                <p class="my-2" style="text-align: center;"><sup>**</sup>T&Cs apply.</p>
+                <button class="reward-apply-btn apply-btn">Apply Now</button>
+            </div>
+            <div class="reward-popup-icons navigation">
+                <button class="reward-home-btn nav-button" onclick="location.href='index.html'"><img
+                        src="images/home.png" alt="Home" /></button>
+                <button class="reward-share-btn nav-button"><img src="images/share.png" alt="Share" /></button>
+            </div>
+        </div>
+    </div>
+    <div id="try-again" class="try-again-overlay" style="display: none;">
+        <div class="try-again-content">
+            <h2 class="mb-4">Keep Trying!</h2>
+            <div class="try-again-score mb-4">You scored <p><span id="try-again-score">0</span> Points</p>
+            </div>
+            <p class="mb-5">Play again to get your reward.</p>
+            <p class="mb-0">Target: 100 Points</p>
+        </div>
+        <div class="d-flex justify-content-center">
+            <button id="play-again-btn" class="restart-btn">Play Again</button>
+        </div>
+    </div>
+
+    <!-- How to Play Section (from index-secondpage.html) -->
+    <div id="how-to-play-section" style="display:none;">
+        <div class="header-sec">
+            <img class="cit-logo" style="display: flex;" src="assets/images/citi-blue-redarc-rgb.png" alt="Citi Logo" />
+        </div>
+        <div class="container pt-3"
+            style="background-image: url(images/screen2-bg.png); background-repeat: no-repeat; background-size: cover; width: 100vw; height: 90vh;">
+            <h2 id="howToPlayHeading" class="subtitle" tabindex="0">How to Play</h2>
+            <div class="instruction-card">
+                <p class="instruction-text">
+                    <b>Navigate around the map to collect</b>
+                    grocery, online shopping, transport, and many more icons!
+                </p>
+                <div class="icons-container">
+                    <div class="flex">
+                        <img src="images/01-icon.png" alt="Transport" class="icon">
+                        <img src="images/02-icon.png" alt="Shopping" class="icon">
+                        <img src="images/03-icon.png" alt="Grocery" class="icon">
+                        <img src="images/04-icon.png" alt="Entertainment" class="icon">
+                    </div>
+                    <div class="flex">
+                        <img src="images/05-icon.png" alt="Dining" class="icon">
+                        <img src="images/06-icon.png" alt="Travel" class="icon">
+                        <img src="images/07-icon.png" alt="Services" class="icon">
+                    </div>
+                </div>
+                <p class="points-text m-0"><b>20 icons, worth 5 points each</b></p>
+            </div>
+            <div class="instruction-card">
+                <p class="instruction-text m-0">
+                    <b>Score 100 points</b><br />
+                    within 1 minute to win a reward. <br />Don’t forget to watch the timer!
+                </p>
+                <div class="timer-section">
+                    <img src="images/timer.png" alt="Timer" class="timer-icon">
+                </div>
+            </div>
+            <h2 class="title">Rewards Eligibility</h2>
+            <img src="images/voucher.png" alt="30% Off" class="reward-image">
+            <div class="start-btn d-flex justify-content-center my-2 pb-3">
+                <button id="start-game-from-how-to-play" class="start btn btn-primary py-2 border-18">Start
+                    Game</button>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="pr_reward_type" />
+    <input type="hidden" id="pr_category" />
+    <input type="hidden" id="pr_image_url" />
+    <script>
+        // Global variable to store the app config
+        window.appConfig = {};
+        // Function to load the config.json file
+        async function loadConfig() {
+            try {
+                let configPath;
+
+                if (window.location.origin === 'https://devgaming.xerago.com') {
+                    configPath = 'config/config.dev.json'; // For the dev environment
+                } else if (window.location.origin === 'https://testgaming.xerago.com') {
+                    configPath = 'config/config.test.json'; // For the test environment
+                } else {
+                    configPath = 'config/config.json'; // For other environments 
+                }
+
+                console.log('Config Path:', configPath);
+                const response = await fetch(`${configPath}`); // Load the config file
+                const config = await response.json();
+                window.appConfig = config; // Store config in global object
+                console.log('Config loaded:', window.appConfig);
+            } catch (error) {
+                console.error("Error loading config:", error);
+                alert("Failed to load configuration.");
+            }
+        }
+        // Load config once the window is loaded
+        window.onload = loadConfig;
+    </script>
+    <!-- External JS for all screens -->
+    <script src="assets/js/Component/downloadBanner.js"></script>
+    <script src="assets/js/Component/Checkitsmobile.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.5.1/snap.svg-min.js"></script>
+    <script type="module" src="assets/js/game-board.js"></script>
+    <script>
+        function copyRewardCouponSection() {
+            const code = document.getElementById("rewardCouponSection").innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                alert("Coupon code copied!");
+            });
+        }
+    </script>
+    <script>
+        function showGameOver(finalScore) {
+            var gameOver = document.getElementById('gameOver');
+            if (gameOver) gameOver.style.display = 'none';
+            var tryAgain = document.getElementById('try-again');
+            var scoreSpan = document.getElementById('try-again-score'); // FIXED: Correct element ID
+            if (scoreSpan) scoreSpan.textContent = finalScore;
+            if (tryAgain) {
+                tryAgain.style.display = 'flex';
+                document.body.style.overflow = 'hidden'; // Prevent background scroll
+                window.scrollTo(0, 0); // Reset scroll for try-again overlay
+            } else {
+                console.warn('Try-again overlay not found in DOM.');
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            // SPA navigation logic with section-specific initialization
+            function showSection(sectionId) {
+                document.getElementById('start-screen').style.display = 'none';
+                document.getElementById('game-screen').style.display = 'none';
+                var howToPlay = document.getElementById('how-to-play-section');
+                if (howToPlay) howToPlay.style.display = 'none';
+                document.getElementById(sectionId).style.display = 'block';
+                // Selective overflow control
+                // Removed the 'game-screen' specific logic from here, as playDoorTransition will handle it.
+                if (sectionId !== 'game-screen') { // Only apply auto overflow if not game-screen
+                    document.body.style.overflow = 'auto';
+                }
+                // Note: initGameScreen() and window.scrollTo(0,0) for game-screen are now handled in playDoorTransition
+            }
+
+            // Step 6: Asset Preloading
+            function preloadGameAssets() {
+                // List of key images to preload
+                const images = [
+                    'images/Citi-logo.png',
+                    'images/citi-card.png',
+                    'images/copy.png',
+                    'images/home.png',
+                    'images/share.png',
+                    'images/01-icon.png',
+                    'images/02-icon.png',
+                    'images/03-icon.png',
+                    'images/04-icon.png',
+                    'images/05-icon.png',
+                    'images/06-icon.png',
+                    'images/07-icon.png',
+                    'images/door-left.PNG',
+                    'images/door-right.PNG',
+                    // Add more as needed
+                ];
+                images.forEach(src => {
+                    const img = new Image();
+                    img.src = src;
+                });
+            }
+
+            // Door Animation Overlay logic
+            function playDoorTransition() {
+                preloadGameAssets(); // Step 6: Preload assets while animation plays
+                const doorOverlay = document.getElementById('door-overlay');
+                const leftDoor = document.getElementById('leftDoor');
+                const rightDoor = document.getElementById('rightDoor');
+                const bottomSlab = document.getElementById('bottomSlab');
+                const gameScreen = document.getElementById('game-screen');
+                const startScreen = document.getElementById('start-screen');
+
+                // Hide the start screen and how-to-play section when door overlay appears
+                if (startScreen) {
+                    startScreen.style.display = 'none';
+                }
+                const howToPlaySection = document.getElementById('how-to-play-section');
+                if (howToPlaySection) {
+                    howToPlaySection.style.display = 'none';
+                }
+
+                // Reset doors
+                leftDoor.className = 'door left-door';
+                rightDoor.className = 'door right-door';
+                bottomSlab.className = 'bottom-slab';
+                doorOverlay.style.display = 'block'; // Make overlay visible
+
+                // Reset game screen position for slide-up
+                if (gameScreen) {
+                    gameScreen.classList.remove('slide-up');
+                    // Set initial state for animation - keep hidden until ready
+                    gameScreen.style.visibility = 'hidden';
+                    gameScreen.style.opacity = '0';
+                    gameScreen.style.display = 'none'; // Keep hidden initially
+                }
+
+                // Immediately set doors to 'active' (closed state) without animation
+                // This makes them appear closed instantly when doorOverlay becomes visible.
+                leftDoor.classList.add('active');
+                rightDoor.classList.add('active');
+                bottomSlab.classList.add('active');
+
+                // After doors are "closed" (now instantaneous), start opening them and prepare game screen
+                setTimeout(() => {
+                    // Set game-screen to display: block here, but keep it visually hidden
+                    if (gameScreen) {
+                        gameScreen.style.display = 'block';
+                        document.body.style.overflow = 'hidden'; // Apply overflow hidden for game screen
+                        window.scrollTo(0, 0); // Reset scroll for game screen
+                        initGameScreen(); // Initialize game logic
+                    }
+
+                    // Trigger door opening animation (takes 1.5s as per CSS transition)
+                    leftDoor.classList.remove('active'); // Remove active to allow 'open' to take effect
+                    rightDoor.classList.remove('active');
+                    bottomSlab.classList.remove('active');
+                    leftDoor.classList.add('open');
+                    rightDoor.classList.add('open');
+                    bottomSlab.classList.add('open');
+
+                    // Make game screen visible (but still off-screen due to transform)
+                    if (gameScreen) {
+                        gameScreen.style.visibility = 'visible';
+                        gameScreen.style.opacity = '1';
+                        // Start slide-up animation with a longer delay for Safari compatibility
+                        setTimeout(() => {
+                            requestAnimationFrame(() => {
+                                gameScreen.classList.add('slide-up'); // Slide-up animation (1.5s)
+                            });
+                        }, 100); // Increased delay for better Safari compatibility
+                    }
+                }, 800); // Increased delay: doors stay closed for 800ms before opening
+
+                // After doors are fully open and game screen has slid up, hide overlay
+                setTimeout(() => {
+                    doorOverlay.style.display = 'none'; // Hide overlay
+                }, 2370); // Updated timing: 800ms (door closed delay) + 100ms (slide-up delay) + 1500ms (door opening duration)
+            }
+
+            // Game initialization logic
+            let gameInitialized = false;
+            function initGameScreen() {
+                if (!gameInitialized) {
+                    if (typeof startGame === "function") {
+                        startGame();
+                    }
+                    gameInitialized = true;
+                }
+            }
+
+            // Start Screen → Game Screen with Door Animation
+            document.getElementById('to-door-animation').onclick = function () {
+                // Start door overlay animation over Start Screen, then switch to Game Screen
+                playDoorTransition();
+            };
+
+            // On load, show only the start screen
+            showSection('start-screen');
+
+            // Add event listener for How to Play link
+            var howToPlayLinks = Array.from(document.querySelectorAll('.tnc a')).filter(a => a.textContent.trim().toLowerCase().includes('how to play'));
+            howToPlayLinks.forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    showSection('how-to-play-section');
+                });
+            });
+            // Add event listener for Start Game button in How to Play section
+            document.addEventListener('click', function (e) {
+                if (e.target && e.target.id === 'start-game-from-how-to-play') {
+                    // Start door overlay animation over How to Play section, then switch to Game Screen
+                    playDoorTransition();
+                }
+            });
+        });
+    </script>
+    <script>
+        // Tap-to-Start Overlay Logic
+        function showTapToStart() {
+            console.log('Showing tap to start overlay');
+
+            // Show the tap to start overlay
+            const tapOverlay = document.getElementById('tapToStart');
+            if (tapOverlay) {
+                tapOverlay.style.display = 'flex';
+                console.log('Tap to start overlay shown');
+            } else {
+                console.error('tapToStart element not found');
+            }
+
+            // Ensure game is in proper reset state
+            if (window.game) {
+                window.game.gameRunning = false;
+                window.game.setupTapToStart(); // Reinitialize tap handlers
+            }
+        }
+
+        function startGameFromTap(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const tapOverlay = document.getElementById('tap-to-start-overlay');
+            if (tapOverlay) {
+                tapOverlay.style.transition = 'opacity 0.5s ease-out';
+                tapOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    tapOverlay.style.display = 'none';
+                    tapOverlay.style.opacity = '1';
+                }, 500);
+                tapOverlay.removeEventListener('click', startGameFromTap);
+                tapOverlay.removeEventListener('touchstart', startGameFromTap);
+            }
+            // CRITICAL FIX: Clear any existing timer before starting
+            if (window.game && window.game.gameTimer) {
+                clearInterval(window.game.gameTimer);
+                window.game.gameTimer = null;
+            }
+            initializeGame();
+        }
+        function initializeGame() {
+            console.log('Starting game initialization...');
+
+            // FIRST: Clear all existing timers
+            clearAllTimers();
+
+            // Ensure game object exists
+            if (!game) {
+                game = new MetroMazeGame();
+            }
+
+            // Reset game state completely
+            game.timeLeft = 60;
+            game.gameRunning = false; // Set to false first
+            game.gameTimer = null;    // Ensure timer is null
+
+            // Now start the game properly
+            game.gameRunning = true;
+            game.startTimer();
+
+            // Initialize player position and movement
+            game.updatePlayerPosition(-90);
+            game.createArrow();
+            game.player = { x: 104, y: 132 };
+            game.updatePlayerPosition(game.currentRotation);
+
+            console.log('Game started:', {
+                running: game.gameRunning,
+                timeLeft: game.timeLeft,
+                timerID: game.gameTimer
+            });
+        }
+        window.addEventListener('load', () => {
+            // Clear any existing timers FIRST
+            clearAllTimers();
+
+            // Initialize the game object but DON'T start anything
+            game = new MetroMazeGame();
+
+            // IMPORTANT: Ensure game is NOT running and timer is null
+            game.gameRunning = false;
+            game.gameTimer = null;
+            game.timeLeft = 60;
+
+            // Setup all buttons
+            // setupRefreshButton();
+            setupPlayAgainButton(); // FIXED: Actually call the function
+
+            // Start door animation (which will lead to tap-to-start)
+            animateDoors();
+
+            console.log('Game initialized, waiting for user tap');
+        });
+    </script>
+    <script>
+        // Improved pull-to-refresh prevention: only block downward swipe from top
+        let maybePrevent = false;
+        let startY = 0;
+        window.addEventListener('touchstart', function (e) {
+            if (e.touches && e.touches.length === 1) {
+                startY = e.touches[0].clientY;
+                maybePrevent = (window.scrollY === 0);
+            }
+        });
+        window.addEventListener('touchmove', function (e) {
+            const currentY = e.touches && e.touches.length ? e.touches[0].clientY : 0;
+            const isPullingDown = currentY - startY > 10;
+            if (maybePrevent && isPullingDown) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+
+</html>
